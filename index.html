@@ -1,0 +1,611 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<title>💌 اعتراف</title>
+<style>
+  * { 
+    margin: 0; 
+    padding: 0; 
+    box-sizing: border-box; 
+    -webkit-tap-highlight-color: transparent;
+  }
+
+  html, body {
+    width: 100%;
+    height: 100%;
+    overflow: hidden;
+    background: linear-gradient(135deg, #2b1810 0%, #4a2c1a 50%, #1a0f08 100%);
+    font-family: 'Amiri', 'Traditional Arabic', serif;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+  }
+
+  /* القطة */
+  .cat {
+    position: fixed;
+    bottom: 12px;
+    right: 12px;
+    font-size: 55px;
+    z-index: 100;
+    animation: catFloat 3s ease-in-out infinite;
+    filter: drop-shadow(0 0 12px rgba(255, 200, 100, 0.6));
+    cursor: pointer;
+  }
+  @keyframes catFloat {
+    0%, 100% { transform: translateY(0); }
+    50% { transform: translateY(-8px); }
+  }
+
+  .cat-bubble {
+    position: fixed;
+    bottom: 82px;
+    right: 10px;
+    background: #fff8e7;
+    color: #4a2c1a;
+    padding: 8px 14px;
+    border-radius: 18px 18px 18px 4px;
+    font-size: 12px;
+    font-weight: bold;
+    max-width: 150px;
+    box-shadow: 0 4px 15px rgba(0,0,0,0.5);
+    opacity: 0;
+    transform: translateY(10px);
+    transition: all 0.4s;
+    pointer-events: none;
+    z-index: 101;
+    border: 2px solid #d4af37;
+    line-height: 1.4;
+  }
+  .cat-bubble.show { opacity: 1; transform: translateY(0); }
+
+  /* الكتاب */
+  .book-container {
+    perspective: 1800px;
+    position: relative;
+    z-index: 10;
+    width: 94vw;
+    max-width: 400px;
+    height: 80vh;
+    max-height: 600px;
+  }
+
+  .book {
+    width: 100%;
+    height: 100%;
+    position: relative;
+    transform-style: preserve-3d;
+  }
+
+  .page {
+    position: absolute;
+    width: 100%;
+    height: 100%;
+    top: 0;
+    left: 0;
+    background: linear-gradient(135deg, #fdf6e3 0%, #f5e6c8 100%);
+    border: 2px solid #8b5a2b;
+    border-radius: 6px;
+    padding: 22px 18px;
+    backface-visibility: hidden;
+    -webkit-backface-visibility: hidden;
+    transform-origin: left center;
+    transition: transform 0.9s cubic-bezier(0.6, 0.05, 0.4, 1);
+    box-shadow: 0 10px 35px rgba(0,0,0,0.7);
+    overflow-y: auto;
+    -webkit-overflow-scrolling: touch;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    text-align: center;
+    transform: rotateY(-180deg);
+    visibility: hidden;
+  }
+
+  .page.visible {
+    transform: rotateY(0deg);
+    visibility: visible;
+  }
+
+  .page::before {
+    content: '';
+    position: absolute;
+    top: 8px; left: 8px; right: 8px; bottom: 8px;
+    border: 1px solid rgba(139,90,43,0.3);
+    border-radius: 3px;
+    pointer-events: none;
+  }
+
+  .page h2 {
+    color: #6b3410;
+    font-size: 20px;
+    margin-bottom: 12px;
+    font-family: 'Aref Ruqaa', serif;
+  }
+
+  .page p {
+    color: #3d2314;
+    font-size: 15px;
+    line-height: 1.85;
+    margin: 6px 0;
+  }
+
+  .page .ornament {
+    color: #d4af37;
+    font-size: 18px;
+    margin: 8px 0;
+    letter-spacing: 4px;
+  }
+
+  .cover {
+    background: linear-gradient(135deg, #5c2e0e 0%, #3d1a06 100%) !important;
+    color: #f5e6c8;
+    border: 3px solid #d4af37 !important;
+    justify-content: center;
+    align-items: center;
+  }
+  .cover h1 {
+    font-size: 28px;
+    color: #d4af37;
+    margin-bottom: 12px;
+    font-family: 'Aref Ruqaa', serif;
+  }
+  .cover .heart {
+    font-size: 55px;
+    color: #c9304a;
+    animation: pulse 1.5s infinite;
+    margin-bottom: 8px;
+  }
+  @keyframes pulse {
+    0%, 100% { transform: scale(1); }
+    50% { transform: scale(1.15); }
+  }
+  .cover p { color: #e8d5a8 !important; font-size: 14px; }
+
+  /* الأزرار */
+  .controls {
+    position: fixed;
+    bottom: 12px;
+    left: 12px;
+    display: flex;
+    gap: 8px;
+    z-index: 100;
+  }
+
+  .btn {
+    background: linear-gradient(135deg, #d4af37, #b8860b);
+    color: #3d1a06;
+    border: 2px solid #fff8e7;
+    padding: 10px 16px;
+    border-radius: 25px;
+    font-family: inherit;
+    font-size: 14px;
+    font-weight: bold;
+    cursor: pointer;
+    box-shadow: 0 4px 15px rgba(212,175,55,0.5);
+    min-width: 65px;
+    touch-action: manipulation;
+  }
+  .btn:active { transform: scale(0.92); }
+  .btn:disabled { opacity: 0.3; }
+
+  /* المؤشر */
+  .page-indicator {
+    position: fixed;
+    top: 10px;
+    left: 50%;
+    transform: translateX(-50%);
+    color: #d4af37;
+    font-size: 12px;
+    background: rgba(43,24,16,0.9);
+    padding: 6px 16px;
+    border-radius: 18px;
+    border: 1px solid #d4af37;
+    z-index: 100;
+    font-weight: bold;
+    white-space: nowrap;
+  }
+
+  /* زر الموسيقى */
+  .music-btn {
+    position: fixed;
+    top: 10px;
+    right: 10px;
+    background: rgba(43,24,16,0.9);
+    border: 2px solid #d4af37;
+    color: #d4af37;
+    font-size: 18px;
+    width: 42px;
+    height: 42px;
+    border-radius: 50%;
+    cursor: pointer;
+    z-index: 100;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    touch-action: manipulation;
+  }
+  .music-btn:active { transform: scale(0.9); }
+  .music-btn.playing { animation: pulse 1.5s infinite; }
+
+  /* نجوم */
+  .star {
+    position: absolute;
+    color: #d4af37;
+    font-size: 11px;
+    opacity: 0.6;
+    animation: twinkle 2s infinite;
+    pointer-events: none;
+  }
+  @keyframes twinkle {
+    0%, 100% { opacity: 0.3; }
+    50% { opacity: 1; }
+  }
+</style>
+</head>
+<body>
+
+<!-- نجوم -->
+<div class="star" style="top:8%;left:12%">✦</div>
+<div class="star" style="top:18%;right:18%">✧</div>
+<div class="star" style="top:72%;left:8%">✦</div>
+<div class="star" style="top:82%;right:12%">✧</div>
+
+<!-- الموسيقى -->
+<audio id="bgMusic" loop preload="auto" playsinline>
+  <source src="him.m4a" type="audio/mp4">
+  <source src="him.mp3" type="audio/mpeg">
+</audio>
+
+<!-- زر الموسيقى -->
+<button class="music-btn" id="musicBtn" title="الموسيقى">🎵</button>
+
+<!-- مؤشر الصفحات -->
+<div class="page-indicator" id="indicator">غلاف الكتاب</div>
+
+<!-- القطة -->
+<div class="cat" id="cat">🐱</div>
+<div class="cat-bubble" id="catBubble">مياو~ أهلاً 💕</div>
+
+<!-- الكتاب -->
+<div class="book-container">
+  <div class="book" id="book">
+
+    <div class="page cover visible" data-page="0">
+      <div class="heart">❤️</div>
+      <h1>كتاب حبي لك</h1>
+      <div class="ornament" style="color:#d4af37;">✦ ✦ ✦</div>
+      <p>رسالة اعتراف من القلب</p>
+    </div>
+
+    <div class="page" data-page="1">
+      <h2>البداية</h2>
+      <div class="ornament">❦</div>
+      <p>أحبج بشكل ما اكدر اوصفه بالكلام</p>
+      <p>
+        أحبج مو حب عادي<br>
+        ولا مجرد إعجاب<br><br>
+        انتي بالنسبة الي<br>
+        صرتي شي أكبر<br>
+        من كل هالكلمات
+      </p>
+    </div>
+
+    <div class="page" data-page="2">
+      <h2>تفاصيلج</h2>
+      <div class="ornament">❦</div>
+      <p>
+        أعشقج بكل تفاصيلج<br>
+        بصوتج، بضحكتج، بحچيج<br><br>
+        وبكل شي يخصج<br><br>
+        حتى الأشياء الصغيرة<br>
+        اللي يمكن انتي ما تنتبهين الها<br>
+        اني انتبه الها وأحبها<br>
+        لأن هي منج
+      </p>
+    </div>
+
+    <div class="page" data-page="3">
+      <h2>اعتراف</h2>
+      <div class="ornament">❦</div>
+      <p>
+        وأعترف لج بشغلة<br>
+        يمكن مرات ما ابينها<br><br>
+        بس اني <strong style="color:#c9304a;">أغار عليج هواية</strong>
+      </p>
+    </div>
+
+    <div class="page" data-page="4">
+      <h2>غيرتي</h2>
+      <div class="ornament">❦</div>
+      <p>
+        أغار من الشخص اللي ياخذ من وقتج أكثر مني<br>
+        وأغار من اللي يضحكج<br>
+        وأغار من اللي يحچي وياج بطريقة قريبة<br><br>
+        وأغار حتى من الأشياء<br>
+        اللي تخليج مشغولة عني
+      </p>
+    </div>
+
+    <div class="page" data-page="5">
+      <h2>ليش؟</h2>
+      <div class="ornament">❦</div>
+      <p>
+        مو لأن ما اثق بيج<br>
+        بالعكس اني اثق بيج<br><br>
+        بس لأن اني أحبج لدرجة<br>
+        أريد أحس ان الي مكان خاص<br>
+        بقلبج ما ياخذه أحد غيري
+      </p>
+    </div>
+
+    <div class="page" data-page="6">
+      <h2>من داخل قلبي</h2>
+      <div class="ornament">❦</div>
+      <p>
+        مرات من اشوفج تحچين ويا غيري<br>
+        أحاول أسوي نفسي عادي<br>
+        بس بداخلي اكو شي يگلي<br><br>
+        ليش مو اني؟<br>
+        وليش هو؟<br>
+        وليش هيج قريب منج؟
+      </p>
+    </div>
+
+    <div class="page" data-page="7">
+      <h2>ما أريد أضايقج</h2>
+      <div class="ornament">❦</div>
+      <p>
+        ويمكن أغار من أبسط الأشياء<br><br>
+        بس ما أريد غيرتي تضايقج<br><br>
+        لأن آخر شي أريده<br>
+        هو ان حبنا يصير سبب يضغط عليج
+      </p>
+    </div>
+
+    <div class="page" data-page="8">
+      <h2>أمنيتي</h2>
+      <div class="ornament">❦</div>
+      <p>
+        أحبج وأريدج مرتاحة<br>
+        وأريدج تضحكين وتعيشين حياتج<br><br>
+        بس بنفس الوقت<br>
+        أتمنى أبقى الشخص اللي<br>
+        من تحتاجين أحد<br>
+        يخطر ببالج اسمه
+      </p>
+    </div>
+
+    <div class="page" data-page="9">
+      <h2>وجودج</h2>
+      <div class="ornament">❦</div>
+      <p>
+        أريدج تعرفين<br>
+        ان وجودج عندي مو عابر<br><br>
+        انتي من الأشخاص<br>
+        اللي دخلوا قلبي<br>
+        وصار الهم مكان<br>
+        ما اكدر أتخلى عنه بسهولة
+      </p>
+    </div>
+
+    <div class="page" data-page="10">
+      <h2>مشاعري</h2>
+      <div class="ornament">❦</div>
+      <p>
+        أحبج وأشتاقلج<br>
+        وأفرح من اشوف اسمج<br>
+        وأتغير من اسمع صوتج<br><br>
+        وأغار عليج من كل شخص<br>
+        أحس انه ممكن ياخذ<br>
+        جزء من اهتمامج
+      </p>
+    </div>
+
+    <div class="page" data-page="11">
+      <h2>ورا غيرتي</h2>
+      <div class="ornament">❦</div>
+      <p>
+        يمكن غيرتي مرات تبين زايدة<br><br>
+        بس صدگيني<br>
+        وراها <strong style="color:#c9304a;">حب كبير</strong><br><br>
+        لأن اني ما أغار منج<br>
+        لأن أريد أمتلكج<br><br>
+        أغار لأنج غالية عليّه
+      </p>
+    </div>
+
+    <div class="page" data-page="12">
+      <h2>الخاتمة</h2>
+      <div class="ornament">❤️</div>
+      <p>
+        وبالنهاية مهما كتبت<br>
+        ومهما حاولت أوصف<br>
+        اللي بداخلي<br><br>
+        راح تبقى اكو مشاعر<br>
+        ما كدرت احچي عنها
+      </p>
+    </div>
+
+    <div class="page" data-page="13">
+      <h2>الحقيقة</h2>
+      <div class="ornament">❤️</div>
+      <p>
+        بس الشي اللي متأكد منه<br><br>
+        <strong style="color:#c9304a;font-size:18px;">اني كلش أحبج</strong><br><br>
+        <strong style="color:#c9304a;font-size:18px;">وأعشقج</strong><br><br>
+        <strong style="color:#c9304a;font-size:18px;">وأغار عليج</strong><br><br>
+        وأريدج تبقين قريبة<br>
+        من قلبي دائماً
+      </p>
+    </div>
+
+  </div>
+</div>
+
+<!-- أزرار التحكم -->
+<div class="controls">
+  <button class="btn" id="prevBtn" disabled>◀ السابق</button>
+  <button class="btn" id="nextBtn">التالي ▶</button>
+</div>
+
+<script>
+  var book = document.getElementById('book');
+  var indicator = document.getElementById('indicator');
+  var musicBtn = document.getElementById('musicBtn');
+  var bgMusic = document.getElementById('bgMusic');
+  var cat = document.getElementById('cat');
+  var catBubble = document.getElementById('catBubble');
+  var prevBtn = document.getElementById('prevBtn');
+  var nextBtn = document.getElementById('nextBtn');
+
+  var allPages = document.querySelectorAll('.page');
+  var currentPage = 0;
+  var totalPages = allPages.length - 1; // 13
+
+  var pageNames = [
+    'غلاف الكتاب',
+    'البداية',
+    'تفاصيلج',
+    'اعتراف',
+    'غيرتي',
+    'ليش؟',
+    'من داخل قلبي',
+    'ما أريد أضايقج',
+    'أمنيتي',
+    'وجودج',
+    'مشاعري',
+    'ورا غيرتي',
+    'الخاتمة',
+    'الحقيقة'
+  ];
+
+  var catPhrases = [
+    "مياو! أنا أحبكم 💕",
+    "مياو~ اعترف بسرعة!",
+    "أنا شاهدة الحب 🐱",
+    "مياو! قلبك كبير 🐾",
+    "هذا الكتاب يشبه قلبي 😸",
+    "اقلب الصفحة مياو~",
+    "أحبج أكثر من السمك!",
+    "مياو! الحب حلو 🥰",
+    "هسّ هسّ... كملي 🤫",
+    "أنا أفضل قطة 😻"
+  ];
+
+  function showCatPhrase() {
+    var phrase = catPhrases[Math.floor(Math.random() * catPhrases.length)];
+    catBubble.textContent = phrase;
+    catBubble.classList.add('show');
+    clearTimeout(catBubble.timeout);
+    catBubble.timeout = setTimeout(function() {
+      catBubble.classList.remove('show');
+    }, 2500);
+  }
+
+  // عرض صفحة معينة
+  function showPage(index) {
+    // خفي الكل
+    for (var i = 0; i < allPages.length; i++) {
+      allPages[i].classList.remove('visible');
+    }
+    // أظهر الصفحة الحالية
+    allPages[index].classList.add('visible');
+
+    // تحديث المؤشر
+    indicator.textContent = pageNames[index] + (index > 0 ? ' (' + index + '/' + totalPages + ')' : '');
+
+    // تفعيل/تعطيل الأزرار
+    prevBtn.disabled = (index === 0);
+    nextBtn.disabled = (index === totalPages);
+  }
+
+  function nextPage() {
+    if (currentPage < totalPages) {
+      currentPage++;
+      showPage(currentPage);
+      if (currentPage === totalPages) {
+        setTimeout(showCatPhrase, 400);
+      }
+    }
+  }
+
+  function prevPage() {
+    if (currentPage > 0) {
+      currentPage--;
+      showPage(currentPage);
+    }
+  }
+
+  // ربط الأزرار
+  nextBtn.onclick = nextPage;
+  prevBtn.onclick = prevPage;
+
+  // النقر على القطة
+  cat.onclick = showCatPhrase;
+  cat.ontouchstart = function(e) {
+    e.preventDefault();
+    showCatPhrase();
+  };
+
+  // الموسيقى
+  musicBtn.onclick = function() {
+    if (bgMusic.paused) {
+      bgMusic.play();
+      musicBtn.classList.add('playing');
+      musicBtn.textContent = '⏸';
+    } else {
+      bgMusic.pause();
+      musicBtn.classList.remove('playing');
+      musicBtn.textContent = '🎵';
+    }
+  };
+
+  // تشغيل الموسيقى عند أول لمسة
+  var musicStarted = false;
+  function startMusic() {
+    if (musicStarted) return;
+    musicStarted = true;
+    bgMusic.volume = 0.6;
+    bgMusic.play().then(function() {
+      musicBtn.classList.add('playing');
+      musicBtn.textContent = '⏸';
+    }).catch(function() {
+      // تجاهل الخطأ
+    });
+  }
+
+  document.addEventListener('click', startMusic, { once: true });
+  document.addEventListener('touchstart', startMusic, { once: true });
+
+  // السحب (Swipe)
+  var touchStartX = 0;
+  var touchEndX = 0;
+
+  document.addEventListener('touchstart', function(e) {
+    touchStartX = e.changedTouches[0].screenX;
+  }, { passive: true });
+
+  document.addEventListener('touchend', function(e) {
+    touchEndX = e.changedTouches[0].screenX;
+    var diff = touchStartX - touchEndX;
+    // سحب لليسار (فرق موجب) = التالي
+    if (diff > 70) {
+      nextPage();
+    }
+    // سحب لليمين (فرق سالب) = السابق
+    else if (diff < -70) {
+      prevPage();
+    }
+  }, { passive: true });
+
+  // تهيئة أولية
+  showPage(0);
+
+  // تحية القطة
+  setTimeout(showCatPhrase, 1200);
+</script>
+</body>
+</html>
